@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Agent Usage · Token 监控</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">au<span>·</span></div><div><strong>AGENT USAGE</strong><small>Token Observatory</small></div></div>
+      <div class="side-section">工作台</div>
+      <a class="nav active" href="#overview"><span class="nav-icon">▦</span> 使用总览</a>
+      <a class="nav" href="#details"><span class="nav-icon">≡</span> 原始记录</a>
+      <div class="side-section side-section-spaced">数据来源</div>
+      <div class="source-note"><span class="pulse"></span><div><strong>统一采集</strong><small>18 种来源 + 扩展插件</small></div></div>
+      <div class="side-bottom"><span>LOCAL / SELF HOSTED</span><span>V 0.1</span></div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div class="breadcrumb">WORKSPACE <span>/</span> ANALYTICS <span>/</span> OVERVIEW</div>
+        <div class="top-actions"><span class="connection"><i></i> <span id="connectionText">等待连接</span></span><button id="refreshButton" class="icon-button" title="刷新数据" aria-label="刷新数据">↻</button></div>
+      </header>
+      <div class="content" id="overview">
+        <div class="heading-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> USAGE INTELLIGENCE</div><h1>每一次调用，<em>都有迹可循。</em></h1><p>跨 Agent 汇集 Token 消耗，按你关心的维度查看趋势与明细。</p></div><div class="heading-aside"><span>数据时间口径</span><strong>UTC <b>+00</b></strong><small>按本地记录时间归集</small></div></div>
+
+        <section class="filter-panel" aria-label="筛选条件">
+          <div class="filter-title"><span class="filter-icon">⌕</span><div><strong>筛选范围</strong><small>支持固定字段与采集插件扩展字段</small></div></div>
+          <div class="filter-grid">
+            <label>开始日期 <input id="fromDate" type="date"></label>
+            <label>结束日期 <input id="toDate" type="date"></label>
+            <label>字段 <select id="filterField"><option value="">全部字段</option></select></label>
+            <label>精确匹配 <input id="filterValue" type="text" placeholder="输入字段值"></label>
+            <label class="search-label">关键词 <input id="searchText" type="search" placeholder="搜索 Agent、模型、项目或扩展值"></label>
+            <button id="applyButton" class="primary-button">应用筛选 <span>→</span></button>
+          </div>
+        </section>
+
+        <section class="kpi-grid" aria-label="汇总指标">
+          <article class="kpi kpi-feature"><div class="kpi-top"><span>总 Token</span><span class="kpi-glyph">◈</span></div><strong id="totalTokens">—</strong><div class="kpi-foot"><span class="tiny-spark">▂ ▄ ▆ ▃ ▇</span><span id="totalEvents">等待数据</span></div></article>
+          <article class="kpi"><div class="kpi-top"><span>输入 Token</span><span class="kpi-glyph">↘</span></div><strong id="inputTokens">—</strong><div class="kpi-foot">不含缓存读取与写入</div></article>
+          <article class="kpi"><div class="kpi-top"><span>输出 Token</span><span class="kpi-glyph">↗</span></div><strong id="outputTokens">—</strong><div class="kpi-foot">推理 Token 为其中子集</div></article>
+          <article class="kpi"><div class="kpi-top"><span>缓存 Token</span><span class="kpi-glyph">⌁</span></div><strong id="cacheTokens">—</strong><div class="kpi-foot">读取 + 写入</div></article>
+          <article class="kpi"><div class="kpi-top"><span>参考费用</span><span class="kpi-glyph">＄</span></div><strong id="costUsd">—</strong><div class="kpi-foot" id="costNote">仅展示来源提供或估算的费用</div></article>
+        </section>
+
+        <section class="analytics-grid">
+          <article class="panel chart-panel"><div class="panel-heading"><div><div class="eyebrow small">TIME SERIES</div><h2>每日消耗</h2></div><div class="panel-meta">按 UTC 日期归集</div></div><div id="dailyChart" class="daily-chart" role="img" aria-label="每日 Token 消耗柱状图"></div></article>
+          <article class="panel split-panel"><div class="panel-heading"><div><div class="eyebrow small">TOP AGENTS</div><h2>Agent 排名</h2></div><div class="panel-meta">总 Token</div></div><div id="agentRanking" class="ranking"></div></article>
+        </section>
+
+        <section class="panel breakdown-panel"><div class="panel-heading"><div><div class="eyebrow small">EXPLORE DATA</div><h2>自定义统计</h2></div><div class="inline-controls"><label>按 <select id="groupBy"></select></label><label>统计 <select id="metric"></select></label></div></div><p class="panel-description">可按任何扩展字段分组，也可对数值型扩展字段求和。</p><div class="table-wrap"><table><thead><tr><th>维度值</th><th>统计值</th><th>记录数</th><th class="bar-th">占比</th></tr></thead><tbody id="statsRows"></tbody></table></div></section>
+
+        <section id="details" class="panel detail-panel"><div class="panel-heading"><div><div class="eyebrow small">EVENT LOG</div><h2>最新记录</h2></div><div class="panel-meta">最近 100 条</div></div><div class="table-wrap"><table><thead><tr><th>时间</th><th>Agent / 模型</th><th>总 Token</th><th>输入</th><th>输出</th><th>缓存</th><th>扩展字段</th></tr></thead><tbody id="eventRows"></tbody></table></div></section>
+        <footer>AGENT USAGE HUB <span>·</span> 统计基于本地记录与采集插件推送，费用为参考值。</footer>
+      </div>
+    </main>
+  </div>
+  <div id="loginOverlay" class="login-overlay"><form id="loginForm" class="login-card"><div class="login-mark">au<span>·</span></div><div class="eyebrow small">SECURE DASHBOARD</div><h2>连接你的使用数据</h2><p>输入服务端 admin-token 文件中的管理 Token。Token 仅保留在当前浏览器标签页。</p><label>管理 Token <input id="adminToken" type="password" autocomplete="off" required placeholder="粘贴管理 Token"></label><button class="primary-button" type="submit">打开监控面板 <span>→</span></button><div id="loginError" role="alert"></div></form></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

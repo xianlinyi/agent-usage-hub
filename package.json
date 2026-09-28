@@ -1,0 +1,27 @@
+{
+  "name": "agent-usage-hub",
+  "version": "0.1.0",
+  "description": "Push-based token usage collection and dashboard for AI agents",
+  "type": "module",
+  "bin": {
+    "agent-usage": "./bin/agent-usage.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "examples",
+    "docs/dashboard-preview.png",
+    "docs/source-support.md"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test",
+    "smoke:package": "npm pack --silent && node scripts/package-smoke.mjs",
+    "start": "node bin/agent-usage.js server start"
+  },
+  "license": "MIT",
+  "dependencies": {}
+}
